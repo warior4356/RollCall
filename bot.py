@@ -331,14 +331,14 @@ class MyClient(discord.Client):
             await message.channel.send(output)
 
         elif message.content.startswith('!RC'):
-            await message.channel.send("RollCall Commands:\n"
+            await message.channel.send("```RollCall Commands:\n"
                                        "!RC trackfleets <FC name> - Starts tracking a fleet under <FC name>\n"
                                        "!RC member <Count> <Member Name> - Lists member's last <Count> fleets\n"
                                        "!RC list <start date> <end date> - Lists all fleets from "
                                        "<start date> to <end date>\n"
                                        "!RC stats <type> <start date> <end date> - Lists <type> statistics from "
                                        "<start date> to <end date>\n"
-                                       "!RC fleet <fleet id> - Lists all information about <fleet id>")
+                                       "!RC fleet <fleet id> - Lists all information about <fleet id>```")
 
         # if message.author.id == 89831133709103104:
         #     lines = message.content.splitlines()
