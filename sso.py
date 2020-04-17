@@ -1,5 +1,3 @@
-from esipy import EsiApp
-from esipy import EsiClient
 from esipy import EsiSecurity
 from flask import Flask
 from flask import Blueprint, current_app, g, session, request

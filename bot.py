@@ -2,9 +2,7 @@
 
 import discord
 import cfg
-import psycopg2
 from dotenv import load_dotenv
-from aiohttp import ClientSession
 import database
 from esipy import EsiApp
 from esipy import EsiClient
