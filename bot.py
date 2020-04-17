@@ -49,7 +49,7 @@ class MyClient(discord.Client):
         if not access_token:
             return
 
-        watching_query = (
+        cursor.execute(
             "SELECT watching FROM commanders WHERE char_id = %s;", (commander_id,)
         )
         row = cursor.fetchone()
