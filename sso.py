@@ -4,6 +4,7 @@ from flask import Blueprint, current_app, g, session, request
 from datetime import datetime
 from datetime import timezone
 from datetime import timedelta
+from random import randint
 import cfg
 import database
 
@@ -21,7 +22,7 @@ security = EsiSecurity(
 )
 
 
-print (security.get_auth_uri(state='SomeRandomGeneratedState', scopes=['esi-fleets.read_fleet.v1']))
+print (security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
 
 
 def create_app(config_filename=None):

@@ -10,6 +10,7 @@ from esipy import EsiSecurity
 from datetime import datetime
 from datetime import timezone
 from datetime import timedelta
+from random import randint
 import asyncio
 
 load_dotenv()
@@ -176,7 +177,7 @@ class MyClient(discord.Client):
         cursor.execute("SELECT access_token, expires, refresh_token FROM commanders WHERE char_id = %s;", (character_id,))
         row = cursor.fetchone()
         if not row:
-            url = (security.get_auth_uri(state='SomeRandomGeneratedState', scopes=['esi-fleets.read_fleet.v1']))
+            url = (security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
             alert = ('I\'m sorry {0.author.mention}, you are not in my database. Please go to {1} and try again.'.format(message, url))
             await message.channel.send(alert)
             return
