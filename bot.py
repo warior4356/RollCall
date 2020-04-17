@@ -44,16 +44,39 @@ class MyClient(discord.Client):
         if not commander_id:
             await message.channel.send("Invalid FC name, tracking disabled. See help.")
             return
+
+        watching_query = (
+            "SELECT watching FROM commanders WHERE char_id = %s;", (commander_id,)
+        )
+        row = cursor.fetchone()
+        if row[0] == 1:
+            await message.channel.send("I am already watching. Please just start your fleet.")
+            return
+
+        await message.channel.send("Tracking Started.")
+
+        update_query = (
+            "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+        )
+        cursor.execute(update_query, (1, commander_id,))
         i = 0
         while True:
             access_token = await self.get_access_token(commander_id, message)
             if not access_token:
+                update_query = (
+                    "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+                )
+                cursor.execute(update_query, (0, commander_id,))
                 return
             fleet_id = await self.get_fleet_id(commander_id, access_token)
             if fleet_id.status == 200:
                 break
             await asyncio.sleep(30)
             if i == 60:
+                update_query = (
+                    "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+                )
+                cursor.execute(update_query, (0, commander_id,))
                 return
             i += 1
 
@@ -65,6 +88,10 @@ class MyClient(discord.Client):
             await asyncio.sleep(wait_time)
             access_token = await self.get_access_token(commander_id, message)
             if not access_token:
+                update_query = (
+                    "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+                )
+                cursor.execute(update_query, (0, commander_id,))
                 return
             fleet_id = await self.get_fleet_id(commander_id, access_token)
             if not fleet_id.status == 200:
@@ -82,6 +109,11 @@ class MyClient(discord.Client):
             status = await self.get_fleet_data(fleet_id.data.get('fleet_id'), access_token)
             if not status == 200:
                 break
+
+        update_query = (
+            "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+        )
+        cursor.execute(update_query, (0, commander_id,))
 
     async def add_name(self, char_id):
         cursor.execute("SELECT * FROM names WHERE char_id = %s;",
