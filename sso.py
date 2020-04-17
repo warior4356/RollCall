@@ -14,7 +14,7 @@ connection.autocommit = True
 cursor = connection.cursor()
 
 security = EsiSecurity(
-    redirect_uri='http://localhost:5000/tokens/new',
+    redirect_uri='http://51.158.104.35:5000/tokens/new',
     client_id='1922eb4bb2294e1ab3f47f15b50de475',
     secret_key= cfg.secret,
     headers={'User-Agent': cfg.agent},
