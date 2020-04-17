@@ -247,7 +247,8 @@ class MyClient(discord.Client):
                 return
 
             if str(message.author.id) not in cfg.authorized:
-                await message.channel.send("I DO NOT RESPECT YOUR AUTHORITY PRIVATE!")
+                await message.channel.send("I DO NOT RESPECT YOUR AUTHORITY PRIVATE! "
+                                           "(Please try `!RC trackfleets <FC name>` instead)")
 
             elif message.content.startswith('!RC set'):
                 role = message.content.split(' ', 3)[2]
