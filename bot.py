@@ -45,6 +45,10 @@ class MyClient(discord.Client):
             await message.channel.send("Invalid FC name, tracking disabled. See help.")
             return
 
+        access_token = await self.get_access_token(commander_id, message)
+        if not access_token:
+            return
+        
         watching_query = (
             "SELECT watching FROM commanders WHERE char_id = %s;", (commander_id,)
         )
