@@ -55,7 +55,7 @@ def receive_token():
     expiration += timedelta(seconds=tokens.get('expires_in'))
     insert_query = (
         "INSERT INTO commanders (char_id, access_token, expires, refresh_token, watching) "
-        "VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;"
+        "VALUES (%s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;"
     )
     cursor.execute(insert_query, (char_id, tokens.get('access_token'), expiration, tokens.get('refresh_token'), 0,))
     return "Auth token added to RollCall successfully"
