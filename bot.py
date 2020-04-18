@@ -84,6 +84,7 @@ class MyClient(discord.Client):
                 cursor.execute(update_query, (0, commander_id,))
                 return
             i += 1
+            print(i)
 
         insert_query = (
             "INSERT INTO fleets (date, fleet_id, fc, duration) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;"
@@ -178,7 +179,7 @@ class MyClient(discord.Client):
         row = cursor.fetchone()
         if not row:
             url = (security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
-            alert = ('I\'m sorry that FC is not in my database. Please go to \n{0}\n and try again.'.format(url))
+            alert = ('I\'m sorry that FC is not in my database. Please go to \n{0}\nand try again.'.format(url))
             await message.channel.send(alert)
             return
         else:
