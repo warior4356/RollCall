@@ -262,6 +262,7 @@ class MyClient(discord.Client):
                     "UPDATE names SET role = %s WHERE char_id = %s;"
                 )
                 cursor.execute(update_query, (role, char_id,))
+                await message.channel.send("{0} set to {1}".format(name, role))
 
             elif message.content.startswith('!RC member'):
                 count = message.content.split(' ', 3)[2]
@@ -270,12 +271,13 @@ class MyClient(discord.Client):
                 if not char_id:
                     await message.channel.send("Invalid member name. See help.")
                     return
-                cursor.execute("SELECT DISTINCT fleets.fleet_id, fleets.fc, fleets.date, fleets.duration "
+                cursor.execute("SELECT DISTINCT fleets.fleet_id, fleets.fc, fleets.date, fleets.duration, names.role "
                                "FROM members LEFT JOIN fleets on members.fleet_id=fleets.fleet_id "
+                               "LEFT JOIN names on members.char_id = names.char_id"
                                "WHERE members.char_id = %s LIMIT %s;",
                                (char_id, count,))
                 rows = cursor.fetchall()
-                output = "```Listing {0}'s last {1} fleets\n". format(member, count)
+                output = "```Listing {0}'s ({2}) last {1} fleets\n". format(member, count, rows[0][4])
                 output += "Fleet ID       | Date       | Fleet Duration | Fleet Commander      | Ships (Ship, Minutes)\n"
                 output += "-------------------------------------------------------------------------------------------\n"
                 for row in rows:
@@ -321,9 +323,9 @@ class MyClient(discord.Client):
                 role = message.content.split(' ', 4)[2]
                 start = message.content.split(' ', 4)[3]
                 end = message.content.split(' ', 4)[4]
-                cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id), "
-                               "count(distinct fleets.fleet_id) FROM names LEFT JOIN members ON "
-                               "names.char_id = members.char_id FULL JOIN fleets on names.char_id = fleets.fc "
+                cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id) "
+                               "FROM names LEFT JOIN members ON "
+                               "names.char_id = members.char_id LEFT JOIN fleets on names.char_id = fleets.fc "
                                "WHERE fleets.date > %s AND fleets.date < %s AND names.role = %s "
                                "group by 1 ORDER BY 2 DESC;",
                                (start, end, role,))
@@ -337,8 +339,11 @@ class MyClient(discord.Client):
                                    "WHERE char_id = %s AND fleets.date > %s AND fleets.date < %s;",
                                    (row[0], start, end,))
                     fleet_time = cursor.fetchone()
+                    cursor.execute("SELECT count(distinct fleets.fleet_id) FROM fleets "
+                                                 "WHERE fleets.fc = %s;", (row[0],))
+                    fc_count = cursor.fetchone()
                     output += "{0: <20} |             {1:04} |         {2:04} |   {3:06} Minutes\n".format(
-                        row[1], row[2] - row[3], row[3], int(fleet_time[0]))
+                        row[1], row[2] - fc_count, fc_count, int(fleet_time[0]))
                 output += "```"
                 await message.channel.send(output)
 
