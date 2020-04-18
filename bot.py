@@ -178,7 +178,7 @@ class MyClient(discord.Client):
         row = cursor.fetchone()
         if not row:
             url = (security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
-            alert = ('I\'m sorry {0.author.mention}, you are not in my database. Please go to {1} and try again.'.format(message, url))
+            alert = ('I\'m sorry that FC is not in my database. Please go to \n{0}\n and try again.'.format(url))
             await message.channel.send(alert)
             return
         else:
