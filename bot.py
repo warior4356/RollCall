@@ -324,7 +324,8 @@ class MyClient(discord.Client):
                 cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id), "
                                "count(distinct fleets.fleet_id) FROM names LEFT JOIN members ON "
                                "names.char_id = members.char_id LEFT JOIN fleets on names.char_id = fleets.fc "
-                               "WHERE fleets.date > %s AND fleets.date < %s AND names.role = %s group by 2;",
+                               "WHERE fleets.date > %s AND fleets.date < %s AND names.role = %s "
+                               "group by 1 ORDER BY 2 DESC;",
                                (start, end, role,))
                 rows = cursor.fetchall()
                 output = "```Listing " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
