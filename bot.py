@@ -277,6 +277,7 @@ class MyClient(discord.Client):
                 rows = cursor.fetchall()
                 output = "```Listing {0}'s last {1} fleets\n". format(member, count)
                 output += "Fleet ID       | Date       | Fleet Duration | Fleet Commander      | Ships (Ship, Minutes)\n"
+                output += "-------------------------------------------------------------------------------------------\n"
                 for row in rows:
                     cursor.execute("SELECT names.name "
                                    "from names where names.char_id = %s;",
@@ -301,6 +302,7 @@ class MyClient(discord.Client):
                 rows = cursor.fetchall()
                 output = "```Listing fleets from {0} to {1}\n".format(start, end)
                 output += "Fleet ID       | Date       | Fleet Duration | Members | Fleet Commander\n"
+                output += "------------------------------------------------------------------------\n"
                 for row in rows:
                     cursor.execute("SELECT count(DISTINCT members.char_id) "
                                    "from members where members.fleet_id = %s;",
@@ -327,8 +329,9 @@ class MyClient(discord.Client):
                 rows = cursor.fetchall()
                 output = "```Listing " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
                 output += "Name                 | Fleets as Member | Fleets as FC | Total Fleet Time\n"
+                output += "-------------------------------------------------------------------------\n"
                 for row in rows:
-                    cursor.execute("SELECT round(sum(duration)/60) FROM members "
+                    cursor.execute("SELECT round(sum(members.duration)/60) FROM members "
                                    "LEFT JOIN fleets on fleets.fleet_id = members.fleet_id "
                                    "WHERE char_id = %s AND fleets.date > %s AND fleets.date < %s;",
                                    (row[0], start, end,))
@@ -344,15 +347,16 @@ class MyClient(discord.Client):
                                "fleets.duration, names.name "
                                "FROM fleets LEFT JOIN members on fleets.fleet_id=members.fleet_id "
                                "Left JOIN names on members.char_id=names.char_id "
-                               "WHERE fleets.fleet_id = %s ORDER BY 1 DESC;",
-                               (fleet_id,))
+                               "WHERE fleets.fleet_id = %s ORDER BY 5 DESC;",
+                               (fleet_id,)) # was order by 1
                 rows = cursor.fetchall()
                 cursor.execute("SELECT names.name FROM names WHERE names.char_id = %s;", (rows[0][1],))
                 commander = cursor.fetchone()
                 output = "```Listing members of fleet {0} on {1} lasting {2} minutes led by {3}\n". format(
                     fleet_id, rows[0][2], int(rows[0][3]/60), commander[0]
                 )
-                output += "Name                 | Time On Fleet | Ships\n"
+                output += "Name                 | Time On Fleet | Ships (Ship, Minutes)\n"
+                output += "------------------------------------------------------------\n"
                 for row in rows:
                     cursor.execute("SELECT round(sum(members.duration)/60) FROM fleets "
                                    "LEFT JOIN members on fleets.fleet_id = members.fleet_id "
@@ -380,11 +384,19 @@ class MyClient(discord.Client):
                                            "<start date> to <end date>\n"
                                            "!RC fleet <fleet id> - Lists all information about <fleet id>```")
 
-        # if message.author.id == 89831133709103104:
-        #     lines = message.content.splitlines()
-        #     fleet_commander = lines[4].split(' ',1)[1]
-        #     await message.channel.send(fleet_commander)
-        #     await self.start_tracking(fleet_commander, message)
+        if message.author.id == 699821079551803394 or message.author.id == 89831133709103104:
+            lines = message.content.splitlines()
+            fleet_commander = ""
+            for line in lines:
+                if line.split(' ', 1)[0] == "FC:":
+                    fleet_commander = line.split(' ', 1)[4]
+                    break
+
+            if len(fleet_commander) == 0:
+                return
+
+            await message.channel.send(fleet_commander)
+            await self.start_tracking(fleet_commander, message)
 
 
 discord_client = MyClient()
