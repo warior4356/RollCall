@@ -273,7 +273,7 @@ class MyClient(discord.Client):
                     return
                 cursor.execute("SELECT DISTINCT fleets.fleet_id, fleets.fc, fleets.date, fleets.duration, names.role "
                                "FROM members LEFT JOIN fleets on members.fleet_id=fleets.fleet_id "
-                               "LEFT JOIN names on members.char_id = names.char_id"
+                               "LEFT JOIN names on members.char_id = names.char_id "
                                "WHERE members.char_id = %s LIMIT %s;",
                                (char_id, count,))
                 rows = cursor.fetchall()
@@ -383,6 +383,7 @@ class MyClient(discord.Client):
             elif message.content.startswith('!RC'):
                 await message.channel.send("```RollCall Commands:\n"
                                            "!RC trackfleets <FC name> - Starts tracking a fleet under <FC name>\n"
+                                           "!RC set <role> <name> - Set's <name>'s role to <role>\n"
                                            "!RC member <Count> <Member Name> - Lists member's last <Count> fleets\n"
                                            "!RC list <start date> <end date> - Lists all fleets from "
                                            "<start date> to <end date>\n"
