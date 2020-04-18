@@ -340,10 +340,10 @@ class MyClient(discord.Client):
                                    (row[0], start, end,))
                     fleet_time = cursor.fetchone()
                     cursor.execute("SELECT count(distinct fleets.fleet_id) FROM fleets "
-                                                 "WHERE fleets.fc = %s;", (row[0],))
+                                   "WHERE fleets.fc = %s;", (row[0],))
                     fc_count = cursor.fetchone()
                     output += "{0: <20} |             {1:04} |         {2:04} |   {3:06} Minutes\n".format(
-                        row[1], row[2] - fc_count, fc_count, int(fleet_time[0]))
+                        row[1], row[2] - fc_count[0], fc_count[0], int(fleet_time[0]))
                 output += "```"
                 await message.channel.send(output)
 
