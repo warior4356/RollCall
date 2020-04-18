@@ -396,13 +396,12 @@ class MyClient(discord.Client):
             fleet_commander = ""
             for line in lines:
                 if line.split(' ', 1)[0] == "FC:":
-                    fleet_commander = line.split(' ', 1)[4]
+                    fleet_commander = line.split(' ', 1)[1]
                     break
 
             if len(fleet_commander) == 0:
                 return
 
-            await message.channel.send(fleet_commander)
             await self.start_tracking(fleet_commander, message)
 
 
