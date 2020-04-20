@@ -75,6 +75,13 @@ class MyClient(discord.Client):
                 return
             fleet_id = await self.get_fleet_id(commander_id, access_token)
             if fleet_id.status == 200:
+                if not fleet_id.data.get("role") == "fleet_commander":
+                    await message.channel.send("The requested name is not the fleet commander. Please try again.")
+                    update_query = (
+                        "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+                    )
+                    cursor.execute(update_query, (0, commander_id,))
+                    return
                 break
             await asyncio.sleep(30)
             if i == 60:
@@ -231,6 +238,10 @@ class MyClient(discord.Client):
         print(self.user.name)
         print(self.user.id)
         print('------')
+        update_query = (
+            "UPDATE commanders SET watching = %s;"
+        )
+        cursor.execute(update_query, (0,))
 
     async def on_message(self, message):
         # we do not want the bot to reply to itself
@@ -291,8 +302,16 @@ class MyClient(discord.Client):
                                    " WHERE members.fleet_id = %s AND members.char_id = %s;",
                                    (row[0], row[1],))
                     ships = cursor.fetchall()
-                    output += "{0:014} | {1} |   {2:04} Minutes | {3: <20} | {4}".format(
+                    line = "{0:014} | {1} |   {2:04} Minutes | {3: <20} | {4}".format(
                         row[0], row[2].date(), int(row[3]/60), fc[0], ships)
+
+                    # Handle character limit
+                    if len(line) + len(output) > 1950:
+                        output += "```"
+                        await message.channel.send(output)
+                        output = "```"
+                    output += line
+
                 output += "```"
                 await message.channel.send(output)
 
@@ -315,8 +334,16 @@ class MyClient(discord.Client):
                                    "from names where names.char_id = %s;",
                                    (row[3],))
                     fc = cursor.fetchone()
-                    output += "{0:014} | {1} |   {2:04} Minutes |     {3:03} | {4}\n".format(
+                    line = "{0:014} | {1} |   {2:04} Minutes |     {3:03} | {4}\n".format(
                         row[0], row[1].date(), int(row[2]/60), count[0], fc[0])
+
+                    # Handle character limit
+                    if len(line) + len(output) > 1950:
+                        output += "```"
+                        await message.channel.send(output)
+                        output = "```"
+                    output += line
+
                 output += "```"
                 await message.channel.send(output)
 
@@ -343,8 +370,16 @@ class MyClient(discord.Client):
                     cursor.execute("SELECT count(distinct fleets.fleet_id) FROM fleets "
                                    "WHERE fleets.fc = %s;", (row[0],))
                     fc_count = cursor.fetchone()
-                    output += "{0: <20} |             {1:04} |         {2:04} |   {3:06} Minutes\n".format(
+                    line = "{0: <20} |             {1:04} |         {2:04} |   {3:06} Minutes\n".format(
                         row[1], row[2] - fc_count[0], fc_count[0], int(fleet_time[0]))
+
+                    # Handle character limit
+                    if len(line) + len(output) > 1950:
+                        output += "```"
+                        await message.channel.send(output)
+                        output = "```"
+                    output += line
+
                 output += "```"
                 await message.channel.send(output)
 
@@ -375,9 +410,17 @@ class MyClient(discord.Client):
                                    " WHERE members.fleet_id = %s AND members.char_id = %s;",
                                    (fleet_id, row[0],))
                     ships = cursor.fetchall()
-                    output += "{0: <20} |          {1:04} | {2}\n".format(
+                    line = "{0: <20} |          {1:04} | {2}\n".format(
                         row[4], int(fleet_time[0]), ships
                     )
+
+                    # Handle character limit
+                    if len(line) + len(output) > 1950:
+                        output += "```"
+                        await message.channel.send(output)
+                        output = "```"
+                    output += line
+
                 output += "```"
                 await message.channel.send(output)
 
