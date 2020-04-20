@@ -355,7 +355,7 @@ class MyClient(discord.Client):
                                "FROM names LEFT JOIN members ON "
                                "names.char_id = members.char_id LEFT JOIN fleets on members.fleet_id = fleets.fleet_id "
                                "WHERE fleets.date > %s AND fleets.date < %s AND names.role LIKE %s "
-                               "group by 1 ORDER BY 2 DESC;",
+                               "group by 1 ORDER BY 2 ASC;",
                                (start, end, role,))
                 rows = cursor.fetchall()
                 output = "```Listing " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
