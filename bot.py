@@ -351,7 +351,7 @@ class MyClient(discord.Client):
                 role = message.content.split(' ', 4)[2]
                 start = message.content.split(' ', 4)[3]
                 end = message.content.split(' ', 4)[4]
-                cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id) "
+                cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id), name.role "
                                "FROM names LEFT JOIN members ON "
                                "names.char_id = members.char_id LEFT JOIN fleets on members.fleet_id = fleets.fleet_id "
                                "WHERE fleets.date > %s AND fleets.date < %s AND names.role LIKE %s "
@@ -359,8 +359,8 @@ class MyClient(discord.Client):
                                (start, end, role,))
                 rows = cursor.fetchall()
                 output = "```Listing " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
-                output += "Name                 | Fleets as Member | Fleets as FC | Total Fleet Time\n"
-                output += "-------------------------------------------------------------------------\n"
+                output += "Name                 | Fleets as Member | Fleets as FC | Total Fleet Time | Role\n"
+                output += "--------------------------------------------------------------------------------\n"
                 for row in rows:
                     cursor.execute("SELECT round(sum(members.duration)/60) FROM members "
                                    "LEFT JOIN fleets on fleets.fleet_id = members.fleet_id "
@@ -370,8 +370,8 @@ class MyClient(discord.Client):
                     cursor.execute("SELECT count(distinct fleets.fleet_id) FROM fleets "
                                    "WHERE fleets.fc = %s;", (row[0],))
                     fc_count = cursor.fetchone()
-                    line = "{0: <20} |             {1:04} |         {2:04} |   {3:06} Minutes\n".format(
-                        row[1], row[2] - fc_count[0], fc_count[0], int(fleet_time[0]))
+                    line = "{0: <20} |             {1:04} |         {2:04} |   {3:06} Minutes | {4}\n".format(
+                        row[1], row[2] - fc_count[0], fc_count[0], int(fleet_time[0]), row[3])
 
                     # Handle character limit
                     if len(line) + len(output) > 1950:
