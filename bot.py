@@ -389,7 +389,7 @@ class MyClient(discord.Client):
                                "fleets.duration, names.name "
                                "FROM fleets LEFT JOIN members on fleets.fleet_id=members.fleet_id "
                                "Left JOIN names on members.char_id=names.char_id "
-                               "WHERE fleets.fleet_id = %s ORDER BY 5 DESC;",
+                               "WHERE fleets.fleet_id = %s ORDER BY 5 ASC;",
                                (fleet_id,)) # was order by 1
                 rows = cursor.fetchall()
                 cursor.execute("SELECT names.name FROM names WHERE names.char_id = %s;", (rows[0][1],))
