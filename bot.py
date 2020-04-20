@@ -270,11 +270,24 @@ class MyClient(discord.Client):
                 if not char_id:
                     await message.channel.send("Invalid name. See help.")
                     return
-                update_query = (
-                    "UPDATE names SET role = %s WHERE char_id = %s;"
+                check_query = (
+                    "SELECT names.name FROM names WHERE name.char_id = %s;"
                 )
-                cursor.execute(update_query, (role, char_id,))
-                await message.channel.send("{0} set to {1}".format(name, role))
+                cursor.execute(check_query, (char_id,))
+                row = cursor.fetchone()
+                if not row:
+                    insert_query = (
+                        "INSERT INTO names(char_id, name, role) VALUES"
+                        " (%s, %s, %s) ON CONFLICT DO NOTHING;"
+                    )
+                    cursor.execute(insert_query, (char_id, name, role,))
+                    await message.channel.send("{0} inserted as {1}".format(name, role))
+                else:
+                    update_query = (
+                        "UPDATE names SET role = %s WHERE char_id = %s;"
+                    )
+                    cursor.execute(update_query, (role, char_id,))
+                    await message.channel.send("{0} set to {1}".format(name, role))
 
             elif message.content.startswith('!RC member'):
                 count = message.content.split(' ', 3)[2]
