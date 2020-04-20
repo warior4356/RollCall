@@ -351,7 +351,7 @@ class MyClient(discord.Client):
                 role = message.content.split(' ', 4)[2]
                 start = message.content.split(' ', 4)[3]
                 end = message.content.split(' ', 4)[4]
-                cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id), name.role "
+                cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id), names.role "
                                "FROM names LEFT JOIN members ON "
                                "names.char_id = members.char_id LEFT JOIN fleets on members.fleet_id = fleets.fleet_id "
                                "WHERE fleets.date > %s AND fleets.date < %s AND names.role LIKE %s "
