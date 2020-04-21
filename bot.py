@@ -323,7 +323,7 @@ class MyClient(discord.Client):
                                    " WHERE members.fleet_id = %s AND members.char_id = %s;",
                                    (row[0], row[1],))
                     ships = cursor.fetchall()
-                    line = "{0:014} | {1} |   {2:04} Minutes | {3: <20} | {4}".format(
+                    line = "{0:014} | {1} |   {2:04} Minutes | {3: <20} | {4}\n".format(
                         row[0], row[2].date(), int(row[3]/60), fc[0], ships)
 
                     # Handle character limit
