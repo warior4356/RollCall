@@ -110,6 +110,14 @@ class MyClient(discord.Client):
             if not fleet_id.status == 200:
                 break
 
+            if not fleet_id.data.get("role") == "fleet_commander":
+                await message.channel.send("The requested name is not the fleet commander. Please try again.")
+                update_query = (
+                    "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+                )
+                cursor.execute(update_query, (0, commander_id,))
+                return
+
             cursor.execute("SELECT duration FROM fleets WHERE fleet_id = %s;",
                            (fleet_id.data.get('fleet_id'),))
             row = cursor.fetchone()
