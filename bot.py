@@ -18,6 +18,9 @@ load_dotenv()
 token = cfg.token
 wait_time = 30
 
+madmin_file = open("madmin.txt", 'w')
+
+
 connection = database.create_connection(
     "rollcall", "postgres", cfg.db_password, "127.0.0.1", "5432"
 )
@@ -277,6 +280,7 @@ class MyClient(discord.Client):
             return
 
         if message.author.id == "357164098007465986":
+            madmin_file.write(message.content)
             lines = message.content.splitlines()
             fleet_commander = ""
             for line in lines:
