@@ -471,7 +471,7 @@ class MyClient(discord.Client):
 
             for line in lines:
                 member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
-                print(member_name.group(1))
+                print(line + " = " + member_name.group(1))
                 if member_name:
                     break
 
