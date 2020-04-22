@@ -265,7 +265,7 @@ class MyClient(discord.Client):
 
             if message.content.startswith('!RC trackfleet'):
                 fleet_commander = message.content.split(' ', 2)[2]
-                await self.start_tracking(fleet_commander, message.author.id)
+                await self.start_tracking(fleet_commander, message.author)
                 return
 
             if str(message.author.id) not in cfg.authorized:
@@ -472,7 +472,7 @@ class MyClient(discord.Client):
             if not member:
                 channel = message.channel
             else:
-                channel = member.id
+                channel = member
 
             await self.start_tracking(fleet_commander, channel)
 
