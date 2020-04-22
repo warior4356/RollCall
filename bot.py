@@ -12,6 +12,7 @@ from datetime import timezone
 from datetime import timedelta
 from random import randint
 import asyncio
+import re
 
 load_dotenv()
 token = cfg.token
@@ -467,8 +468,14 @@ class MyClient(discord.Client):
 
             if len(fleet_commander) == 0:
                 return
+
+            for line in lines:
+                member_name = re.search("#### SENT BY (.*) to Dreddit - Fleets.*", line)
+                if member_name:
+                    break
+
             channel = 0
-            member = message.guild.get_member_named(fleet_commander)
+            member = message.guild.get_member_named(member_name)
             if not member:
                 channel = message.channel
             else:
