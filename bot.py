@@ -469,6 +469,7 @@ class MyClient(discord.Client):
             if len(fleet_commander) == 0:
                 return
 
+            print("test")
             for line in lines:
                 member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
                 print(line + " = " + member_name.group(1))
