@@ -470,7 +470,7 @@ class MyClient(discord.Client):
                 return
 
             for line in lines:
-                member_name = re.search("#### SENT BY (.*) to Dreddit - Fleets.*", line)
+                member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
                 print(member_name.group())
                 if member_name:
                     break
