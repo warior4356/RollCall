@@ -84,8 +84,8 @@ class MyClient(discord.Client):
                     cursor.execute(update_query, (0, commander_id,))
                     return
                 break
-            await asyncio.sleep(30)
-            if i == 60:
+            await asyncio.sleep(60)
+            if i == 30:
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
@@ -265,7 +265,7 @@ class MyClient(discord.Client):
 
             if message.content.startswith('!RC trackfleet'):
                 fleet_commander = message.content.split(' ', 2)[2]
-                await self.start_tracking(fleet_commander, message.channel)
+                await self.start_tracking(fleet_commander, message.author.id)
                 return
 
             if str(message.author.id) not in cfg.authorized:
@@ -467,8 +467,14 @@ class MyClient(discord.Client):
 
             if len(fleet_commander) == 0:
                 return
+            channel = 0
+            member = message.guild.get_member_named(fleet_commander)
+            if not member:
+                channel = message.channel
+            else:
+                channel = member.id
 
-            await self.start_tracking(fleet_commander, message.channel)
+            await self.start_tracking(fleet_commander, channel)
 
 
 discord_client = MyClient()
