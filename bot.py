@@ -58,12 +58,13 @@ class MyClient(discord.Client):
             await message.channel.send("I am already watching. Please just start your fleet.")
             return
 
-        await message.channel.send("Tracking Started.")
-
         update_query = (
             "UPDATE commanders SET watching = %s WHERE char_id = %s;"
         )
         cursor.execute(update_query, (1, commander_id,))
+
+        await message.channel.send("Tracking Started.")
+
         i = 0
         while True:
             access_token = await self.get_access_token(commander_id, message)
@@ -340,7 +341,7 @@ class MyClient(discord.Client):
                 start = message.content.split(' ', 3)[2]
                 end = message.content.split(' ', 3)[3]
                 cursor.execute("SELECT DISTINCT fleets.fleet_id, fleets.date, fleets.duration, fleets.fc "
-                               "from fleets where fleets.date between %s and %s;",
+                               "from fleets where fleets.date between %s and %s ORDER BY 2 DESC;",
                                (start, end,))
                 rows = cursor.fetchall()
                 output = "```Listing fleets from {0} to {1}\n".format(start, end)
