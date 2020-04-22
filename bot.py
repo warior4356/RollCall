@@ -40,13 +40,13 @@ esi_client = EsiClient(
 )
 
 class MyClient(discord.Client):
-    async def start_tracking(self, fleet_commander, message):
+    async def start_tracking(self, fleet_commander, channel):
         commander_id = await self.get_character_id(fleet_commander)
         if not commander_id:
-            await message.channel.send("Invalid FC name, tracking disabled. See help.")
+            await channel.send("Invalid FC name, tracking disabled. See help.")
             return
 
-        access_token = await self.get_access_token(commander_id, message)
+        access_token = await self.get_access_token(commander_id, channel)
         if not access_token:
             return
 
@@ -55,7 +55,7 @@ class MyClient(discord.Client):
         )
         row = cursor.fetchone()
         if row[0] == 1:
-            await message.channel.send("I am already watching. Please just start your fleet.")
+            await channel.send("I am already watching. Please just start your fleet.")
             return
 
         update_query = (
@@ -63,11 +63,11 @@ class MyClient(discord.Client):
         )
         cursor.execute(update_query, (1, commander_id,))
 
-        await message.channel.send("Tracking Started.")
+        await channel.send("Tracking Started.")
 
         i = 0
         while True:
-            access_token = await self.get_access_token(commander_id, message)
+            access_token = await self.get_access_token(commander_id, channel)
             if not access_token:
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
@@ -77,7 +77,7 @@ class MyClient(discord.Client):
             fleet_id = await self.get_fleet_id(commander_id, access_token)
             if fleet_id.status == 200:
                 if not fleet_id.data.get("role") == "fleet_commander":
-                    await message.channel.send("The requested name is not the fleet commander. Please try again.")
+                    await channel.send("The requested name is not the fleet commander. Please try again.")
                     update_query = (
                         "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                     )
@@ -100,7 +100,7 @@ class MyClient(discord.Client):
         cursor.execute(insert_query, (datetime.now(timezone.utc), fleet_id.data.get('fleet_id'), commander_id, 0,))
         while True:
             await asyncio.sleep(wait_time)
-            access_token = await self.get_access_token(commander_id, message)
+            access_token = await self.get_access_token(commander_id, channel)
             if not access_token:
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
@@ -112,7 +112,7 @@ class MyClient(discord.Client):
                 break
 
             if not fleet_id.data.get("role") == "fleet_commander":
-                await message.channel.send("The requested name is not the fleet commander. Please try again.")
+                await channel.send("The requested name is not the fleet commander. Please try again.")
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
@@ -190,13 +190,13 @@ class MyClient(discord.Client):
                                                   fleet_id, member.get('ship_type_id'), wait_time,))
         return response.status
 
-    async def get_access_token(selfs, character_id, message):
+    async def get_access_token(selfs, character_id, channel):
         cursor.execute("SELECT access_token, expires, refresh_token FROM commanders WHERE char_id = %s;", (character_id,))
         row = cursor.fetchone()
         if not row:
             url = (security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
             alert = ('I\'m sorry that FC is not in my database. Please go to \n{0}\nand try again.'.format(url))
-            await message.channel.send(alert)
+            await channel.send(alert)
             return
         else:
             if datetime.now(timezone.utc) > row[1]:
@@ -265,7 +265,7 @@ class MyClient(discord.Client):
 
             if message.content.startswith('!RC trackfleet'):
                 fleet_commander = message.content.split(' ', 2)[2]
-                await self.start_tracking(fleet_commander, message)
+                await self.start_tracking(fleet_commander, message.channel)
                 return
 
             if str(message.author.id) not in cfg.authorized:
@@ -468,7 +468,7 @@ class MyClient(discord.Client):
             if len(fleet_commander) == 0:
                 return
 
-            await self.start_tracking(fleet_commander, message)
+            await self.start_tracking(fleet_commander, message.channel)
 
 
 discord_client = MyClient()
