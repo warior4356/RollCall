@@ -469,15 +469,11 @@ class MyClient(discord.Client):
             if len(fleet_commander) == 0:
                 return
 
-            print("test")
             for line in lines:
                 member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
-                print(line)
                 if member_name:
-                    print(member_name.group(1))
                     break
 
-            # channel = 0
             member = message.guild.get_member_named(member_name.group(1))
             if not member:
                 channel = message.channel
