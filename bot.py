@@ -76,6 +76,14 @@ class MyClient(discord.Client):
                 cursor.execute(update_query, (0, commander_id,))
                 return
             fleet_id = await self.get_fleet_id(commander_id, access_token)
+
+            if fleet_id.status == 403:
+                revoke_query = (
+                    "DELETE FROM commanders WHERE commanders.char_id = %s;"
+                )
+                cursor.execute(revoke_query, (commander_id,))
+                return
+
             if fleet_id.status == 200:
                 if not fleet_id.data.get("role") == "fleet_commander":
                     await channel.send("The requested name is not the fleet commander. Please try again.")
@@ -109,6 +117,14 @@ class MyClient(discord.Client):
                 cursor.execute(update_query, (0, commander_id,))
                 return
             fleet_id = await self.get_fleet_id(commander_id, access_token)
+
+            if fleet_id.status == 403:
+                revoke_query = (
+                    "DELETE FROM commanders WHERE commanders.char_id = %s;"
+                )
+                cursor.execute(revoke_query, (commander_id,))
+                return
+
             if not fleet_id.status == 200:
                 break
 
@@ -209,11 +225,12 @@ class MyClient(discord.Client):
                 tokens = security.refresh()
 
                 expiration = datetime.now(timezone.utc)
-                expiration += timedelta(seconds=tokens.get('expires_in'))
+                expiration += timedelta(seconds=tokens.get('expires_in') - 120)
                 update_query = (
-                    "UPDATE commanders SET access_token = %s, expires = %s WHERE char_id = %s;"
+                    "UPDATE commanders SET access_token = %s, expires = %s, refresh_token = %s WHERE char_id = %s;"
                 )
-                cursor.execute(update_query, (tokens.get('access_token'), expiration, character_id,))
+                cursor.execute(update_query, (tokens.get('access_token'), expiration, tokens.get('refresh_token'),
+                                              character_id,))
 
                 return tokens.get('access_token')
             else:
