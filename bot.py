@@ -280,6 +280,7 @@ class MyClient(discord.Client):
             return
 
         if message.author.id == "357164098007465986":
+            print(message.content)
             madmin_file.write(message.content)
             lines = message.content.splitlines()
             fleet_commander = ""
