@@ -276,6 +276,33 @@ class MyClient(discord.Client):
         if message.author.id == self.user.id:
             return
 
+        if message.author.id == 699821079551803394 or message.author.id == 89831133709103104:
+            lines = message.content.splitlines()
+            fleet_commander = ""
+            for line in lines:
+                if line.split(' ', 1)[0] == "FC:":
+                    fleet_commander = line.split(' ', 1)[1]
+                    break
+
+            if len(fleet_commander) == 0:
+                return
+
+            for line in lines:
+                member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
+                if member_name:
+                    break
+
+            member = message.guild.get_member_named(member_name.group(1))
+            if not member:
+                channel = message.channel
+            else:
+                channel = member
+
+            await self.start_tracking(fleet_commander, channel)
+
+        if message.author.bot:
+            return
+
         if message.content.startswith('!hello'):
             await message.channel.send('Hello {0.author.mention}'.format(message))
             return
@@ -475,30 +502,6 @@ class MyClient(discord.Client):
                                            "!RC stats <type> <start date> <end date> - Lists <type> statistics from "
                                            "<start date> to <end date>\n"
                                            "!RC fleet <fleet id> - Lists all information about <fleet id>```")
-
-        if message.author.id == 699821079551803394 or message.author.id == 89831133709103104:
-            lines = message.content.splitlines()
-            fleet_commander = ""
-            for line in lines:
-                if line.split(' ', 1)[0] == "FC:":
-                    fleet_commander = line.split(' ', 1)[1]
-                    break
-
-            if len(fleet_commander) == 0:
-                return
-
-            for line in lines:
-                member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
-                if member_name:
-                    break
-
-            member = message.guild.get_member_named(member_name.group(1))
-            if not member:
-                channel = message.channel
-            else:
-                channel = member
-
-            await self.start_tracking(fleet_commander, channel)
 
 
 discord_client = MyClient()
