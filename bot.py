@@ -279,7 +279,8 @@ class MyClient(discord.Client):
         if message.author.id == self.user.id:
             return
 
-        if message.author.id == 357164098007465986 or message.channel.id == 697196106513121312:
+        if message.author.id == 357164098007465986 or message.channel.id == 362030937401196554 \
+                or message.channel.id == 697196106513121312:
             print(message.content)
             madmin_file.write(message.content)
             lines = message.content.splitlines()
