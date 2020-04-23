@@ -104,7 +104,6 @@ class MyClient(discord.Client):
                 cursor.execute(update_query, (0, commander_id,))
                 return
             i += 1
-            print(i)
 
         insert_query = (
             "INSERT INTO fleets (date, fleet_id, fc, duration) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;"
@@ -279,10 +278,7 @@ class MyClient(discord.Client):
         if message.author.id == self.user.id:
             return
 
-        if message.author.id == 357164098007465986 or message.channel.id == 362030937401196554 \
-                or message.channel.id == 697196106513121312:
-            print(message.content)
-            madmin_file.write(message.content)
+        if message.author.id == 357164098007465986 or message.channel.id == 362030937401196554:
             lines = message.content.splitlines()
             fleet_commander = ""
             for line in lines:
