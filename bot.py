@@ -438,7 +438,8 @@ class MyClient(discord.Client):
                                    (row[0], start, end,))
                     fleet_time = cursor.fetchone()
                     cursor.execute("SELECT count(distinct fleets.fleet_id) FROM fleets "
-                                   "WHERE fleets.fc = %s;", (row[0],))
+                                   "WHERE fleets.fc = %s AND fleets.date > %s AND fleets.date < %s;",
+                                   (row[0], start, end,))
                     fc_count = cursor.fetchone()
                     line = "{0: <20} |             {1:04} |         {2:04} |   {3:06} Minutes | {4}\n".format(
                         row[1], row[2] - fc_count[0], fc_count[0], int(fleet_time[0]), row[3])

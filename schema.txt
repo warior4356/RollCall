@@ -1,0 +1,37 @@
+CREATE TABLE commanders(
+   char_id integer,
+   access_token varchar,
+   expires timestamptz,
+   refresh_token varchar,
+   watching integer,
+   PRIMARY KEY(char_id)
+);
+
+CREATE TABLE fleets(
+   date timestamp,
+   fleet_id bigint,
+   fc integer,
+   duration integer,
+   PRIMARY KEY(fleet_id)
+);
+
+CREATE TABLE members(
+   char_id integer,
+   fleet_id bigint,
+   ship_id integer,
+   duration integer,
+   PRIMARY KEY(char_id, fleet_id, ship_id)
+);
+
+CREATE TABLE ships(
+   ship_id integer,
+   ship_name varchar,
+   PRIMARY KEY(ship_id)
+);
+
+CREATE TABLE names(
+   char_id integer,
+   name varchar,
+   role varchar,
+   PRIMARY KEY(char_id)
+);
