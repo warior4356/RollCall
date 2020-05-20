@@ -95,10 +95,7 @@ class MyClient(discord.Client):
                     )
                     cursor.execute(update_query, (0, boss_id,))
 
-                    await channel.send(fleet_id.data)
-                    await channel.send(boss_id)
                     boss_id = fleet_id.data.get("fleet_boss_id")
-                    await channel.send(boss_id)
 
                     update_query = (
                         "UPDATE commanders SET watching = %s WHERE char_id = %s;"
@@ -146,9 +143,9 @@ class MyClient(discord.Client):
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
                 cursor.execute(update_query, (0, boss_id,))
-                await channel.send(boss_id)
+
                 boss_id = fleet_id.data.get("fleet_boss_id")
-                await channel.send(boss_id)
+
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
