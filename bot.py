@@ -46,17 +46,17 @@ esi_client = EsiClient(
 
 class MyClient(discord.Client):
     async def start_tracking(self, fleet_commander, channel):
-        commander_id = await self.get_character_id(fleet_commander)
-        if not commander_id:
+        boss_id = await self.get_character_id(fleet_commander)
+        if not boss_id:
             await channel.send("Invalid FC name, tracking disabled. See help.")
             return
 
-        access_token = await self.get_access_token(commander_id, channel)
+        access_token = await self.get_access_token(boss_id, channel)
         if not access_token:
             return
 
         cursor.execute(
-            "SELECT watching FROM commanders WHERE char_id = %s;", (commander_id,)
+            "SELECT watching FROM commanders WHERE char_id = %s;", (boss_id,)
         )
         row = cursor.fetchone()
         if row[0] == 1:
@@ -66,80 +66,92 @@ class MyClient(discord.Client):
         update_query = (
             "UPDATE commanders SET watching = %s WHERE char_id = %s;"
         )
-        cursor.execute(update_query, (1, commander_id,))
+        cursor.execute(update_query, (1, boss_id,))
 
         await channel.send("Tracking Started.")
 
         i = 0
         while True:
-            access_token = await self.get_access_token(commander_id, channel)
+            access_token = await self.get_access_token(boss_id, channel)
             if not access_token:
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
-                cursor.execute(update_query, (0, commander_id,))
+                cursor.execute(update_query, (0, boss_id,))
                 return
-            fleet_id = await self.get_fleet_id(commander_id, access_token)
+            fleet_id = await self.get_fleet_id(boss_id, access_token)
 
             if fleet_id.status == 403:
                 revoke_query = (
                     "DELETE FROM commanders WHERE commanders.char_id = %s;"
                 )
-                cursor.execute(revoke_query, (commander_id,))
+                cursor.execute(revoke_query, (boss_id,))
                 return
 
             if fleet_id.status == 200:
-                if not fleet_id.data.get("role") == "fleet_commander":
-                    await channel.send("The requested name is not the fleet commander. Please try again.")
+                if not fleet_id.data.get("fleet_boss_id") == boss_id:
+                    # await channel.send("The requested name is not the fleet commander. Please try again.")
                     update_query = (
                         "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                     )
-                    cursor.execute(update_query, (0, commander_id,))
-                    return
+                    cursor.execute(update_query, (0, boss_id,))
+
+                    boss_id = fleet_id.data.get("fleet_boss_id")
+
+                    update_query = (
+                        "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+                    )
+                    cursor.execute(update_query, (1, boss_id,))
+                    continue
                 break
             await asyncio.sleep(60)
             if i == 30:
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
-                cursor.execute(update_query, (0, commander_id,))
+                cursor.execute(update_query, (0, boss_id,))
                 return
             i += 1
 
         insert_query = (
             "INSERT INTO fleets (date, fleet_id, fc, duration) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;"
         )
-        cursor.execute(insert_query, (datetime.now(timezone.utc), fleet_id.data.get('fleet_id'), commander_id, 0,))
+        cursor.execute(insert_query, (datetime.now(timezone.utc), fleet_id.data.get('fleet_id'), boss_id, 0,))
         while True:
             await asyncio.sleep(wait_time)
-            access_token = await self.get_access_token(commander_id, channel)
+            access_token = await self.get_access_token(boss_id, channel)
             if not access_token:
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
-                cursor.execute(update_query, (0, commander_id,))
+                cursor.execute(update_query, (0, boss_id,))
                 return
-            fleet_id = await self.get_fleet_id(commander_id, access_token)
+            fleet_id = await self.get_fleet_id(boss_id, access_token)
 
             if fleet_id.status == 403:
                 revoke_query = (
                     "DELETE FROM commanders WHERE commanders.char_id = %s;"
                 )
-                cursor.execute(revoke_query, (commander_id,))
+                cursor.execute(revoke_query, (boss_id,))
                 return
 
             if not fleet_id.status == 200:
                 break
 
-            print(fleet_id.data.get("fleet_boss_id"))
-
-            if not fleet_id.data.get("role") == "fleet_commander":
-                await channel.send("The requested name is not the fleet commander. Please try again.")
+            if not fleet_id.data.get("fleet_boss_id") == boss_id:
+                # await channel.send("The requested name is not the fleet commander. Please try again.")
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
-                cursor.execute(update_query, (0, commander_id,))
-                return
+                cursor.execute(update_query, (0, boss_id,))
+
+                boss_id = fleet_id.data.get("fleet_boss_id")
+
+                update_query = (
+                    "UPDATE commanders SET watching = %s WHERE char_id = %s;"
+                )
+                cursor.execute(update_query, (1, boss_id,))
+                continue
 
             cursor.execute("SELECT duration FROM fleets WHERE fleet_id = %s;",
                            (fleet_id.data.get('fleet_id'),))
@@ -157,7 +169,7 @@ class MyClient(discord.Client):
         update_query = (
             "UPDATE commanders SET watching = %s WHERE char_id = %s;"
         )
-        cursor.execute(update_query, (0, commander_id,))
+        cursor.execute(update_query, (0, boss_id,))
 
     async def add_name(self, char_id):
         cursor.execute("SELECT * FROM names WHERE char_id = %s;",
