@@ -96,6 +96,7 @@ class MyClient(discord.Client):
                     )
                     cursor.execute(update_query, (0, boss_id,))
 
+                    await channel.send(fleet_id.data)
                     await channel.send(boss_id)
                     boss_id = fleet_id.data.get("fleet_boss_id")
                     await channel.send(boss_id)
