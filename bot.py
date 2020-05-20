@@ -130,6 +130,8 @@ class MyClient(discord.Client):
             if not fleet_id.status == 200:
                 break
 
+            print(fleet_id.data.get("fleet_boss_id"))
+
             if not fleet_id.data.get("role") == "fleet_commander":
                 await channel.send("The requested name is not the fleet commander. Please try again.")
                 update_query = (
@@ -259,7 +261,9 @@ class MyClient(discord.Client):
                 return 0
 
     async def get_fleet_id(self, character_id, access_token):
-        fleet_id_opp = app.op['get_characters_character_id_fleet'](character_id=character_id, token=access_token,)
+        fleet_id_opp = app.op['get_characters_character_id_fleet'](character_id=character_id,
+                                                                   token=access_token,
+                                                                   version="dev",)
         response = esi_client.request(fleet_id_opp)
         return response
 
