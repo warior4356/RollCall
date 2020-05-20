@@ -28,7 +28,7 @@ connection.autocommit = True
 cursor = connection.cursor()
 
 esi_app = EsiApp()
-app = esi_app.get_latest_swagger
+app = esi_app.get_dev_swagger
 
 security = EsiSecurity(
     redirect_uri='http://51.158.104.35:5000/tokens/new',
@@ -41,7 +41,6 @@ esi_client = EsiClient(
     retry_requests=True,
     headers={'User-Agent': cfg.agent},
     security=security,
-    version="dev",
 )
 
 class MyClient(discord.Client):
