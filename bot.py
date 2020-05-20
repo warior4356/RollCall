@@ -40,7 +40,8 @@ security = EsiSecurity(
 esi_client = EsiClient(
     retry_requests=True,
     headers={'User-Agent': cfg.agent},
-    security=security
+    security=security,
+    version="dev",
 )
 
 class MyClient(discord.Client):
@@ -262,8 +263,7 @@ class MyClient(discord.Client):
 
     async def get_fleet_id(self, character_id, access_token):
         fleet_id_opp = app.op['get_characters_character_id_fleet'](character_id=character_id,
-                                                                   token=access_token,
-                                                                   version="dev",)
+                                                                   token=access_token,)
         response = esi_client.request(fleet_id_opp)
         return response
 
