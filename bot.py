@@ -440,7 +440,7 @@ class MyClient(discord.Client):
                                "FROM names LEFT JOIN members ON "
                                "names.char_id = members.char_id LEFT JOIN fleets on members.fleet_id = fleets.fleet_id "
                                "WHERE fleets.date > %s AND fleets.date < %s AND names.role LIKE %s "
-                               "group by 1 ORDER BY 2 ASC;",
+                               "group by 1 ORDER BY 4 ASC, 2 ASC;",
                                (start, end, role,))
                 rows = cursor.fetchall()
                 output = "```Listing " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
@@ -468,6 +468,12 @@ class MyClient(discord.Client):
 
                 output += "```"
                 await message.channel.send(output)
+
+            elif message.content.startswith('!RC naughty'):
+                role = message.content.split(' ', 4)[2]
+                start = message.content.split(' ', 4)[3]
+                end = message.content.split(' ', 4)[4]
+                await message.channel.send("Whose been naughty?")
 
             elif message.content.startswith('!RC fleet'):
                 fleet_id = message.content.split(' ', 2)[2]
