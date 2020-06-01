@@ -436,6 +436,7 @@ class MyClient(discord.Client):
                 role = message.content.split(' ', 4)[2]
                 start = message.content.split(' ', 4)[3]
                 end = message.content.split(' ', 4)[4]
+                # The nice
                 cursor.execute("SELECT names.char_id, names.name, count(distinct members.fleet_id), names.role "
                                "FROM names LEFT JOIN members ON "
                                "names.char_id = members.char_id LEFT JOIN fleets on members.fleet_id = fleets.fleet_id "
@@ -443,7 +444,7 @@ class MyClient(discord.Client):
                                "group by 1 ORDER BY 4 ASC, 2 ASC;",
                                (start, end, role,))
                 rows = cursor.fetchall()
-                output = "```Listing " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
+                output = "```Listing participating " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
                 output += "Name                 | Fleets as Member | Fleets as FC | Total Fleet Time | Role\n"
                 output += "--------------------------------------------------------------------------------\n"
                 for row in rows:
@@ -469,11 +470,31 @@ class MyClient(discord.Client):
                 output += "```"
                 await message.channel.send(output)
 
-            elif message.content.startswith('!RC naughty'):
-                role = message.content.split(' ', 4)[2]
-                start = message.content.split(' ', 4)[3]
-                end = message.content.split(' ', 4)[4]
-                await message.channel.send("Whose been naughty?")
+                # The naughty
+                cursor.execute("SELECT names.char_id, names.name, names.role FROM names WHERE names.char_id NOT IN "
+                               "(SELECT names.char_id"
+                               "FROM names LEFT JOIN members ON "
+                               "names.char_id = members.char_id LEFT JOIN fleets on members.fleet_id = fleets.fleet_id "
+                               "WHERE fleets.date > %s AND fleets.date < %s AND names.role LIKE %s "
+                               "group by 1) ORDER BY 3 ASC, 2 ASC;",
+                               (start, end, role,))
+                rows = cursor.fetchall()
+                output = "```Listing non participating " + str(role) + " from " + str(start) + " to " + str(end) + "\n"
+                output += "Name                 | Role\n"
+                output += "---------------------------\n"
+                for row in rows:
+                    line = "{0: <20} | {1}\n".format(
+                        row[1], row[2])
+
+                    # Handle character limit
+                    if len(line) + len(output) > 1950:
+                        output += "```"
+                        await message.channel.send(output)
+                        output = "```"
+                    output += line
+
+                output += "```"
+                await message.channel.send(output)
 
             elif message.content.startswith('!RC fleet'):
                 fleet_id = message.content.split(' ', 2)[2]
