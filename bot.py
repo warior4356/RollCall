@@ -472,7 +472,7 @@ class MyClient(discord.Client):
 
                 # The naughty
                 cursor.execute("SELECT names.char_id, names.name, names.role FROM names WHERE names.char_id NOT IN "
-                               "(SELECT names.char_id"
+                               "(SELECT names.char_id "
                                "FROM names LEFT JOIN members ON "
                                "names.char_id = members.char_id LEFT JOIN fleets on members.fleet_id = fleets.fleet_id "
                                "WHERE fleets.date > %s AND fleets.date < %s AND names.role LIKE %s "
