@@ -301,8 +301,9 @@ class MyClient(discord.Client):
         if message.author.id == self.user.id:
             return
 
-        if message.author.id == 357164098007465986 or message.channel.id == 362030937401196554 or \
-                message.channel.id == 699851455112413194:
+        # if message.author.id == 357164098007465986 or message.channel.id == 362030937401196554 or \
+        #         message.channel.id == 699851455112413194:
+        if message.channel.id == 699851455112413194:
             lines = message.content.splitlines()
             fleet_commander = ""
             for line in lines:
