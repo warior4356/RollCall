@@ -324,7 +324,7 @@ class MyClient(discord.Client):
             else:
                 channel = member
 
-            await message.add_reaction('eyes')
+            await message.add_reaction(u"\U0001F440")
             await self.start_tracking(fleet_commander, channel)
 
         if message.author.bot:
