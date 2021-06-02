@@ -242,9 +242,10 @@ class MyClient(discord.Client):
                 try:
                     tokens = security.refresh()
                 except:
+                    print(str(datetime.utcnow()) + '\n' + traceback.format_exc())
                     url = (
                         security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
-                    alert = ('I\'m sorry that FC\' ESI token has expired. Please go to \n{0}\nand '
+                    alert = ('I\'m sorry that FC\'s ESI token has expired. Please go to \n{0}\nand '
                              'try again using `!RC trackfleet <fc name>`'.format(url))
                     await channel.send(alert)
                     return
