@@ -323,6 +323,7 @@ class MyClient(discord.Client):
             else:
                 channel = member
 
+            await message.react('eyes')
             await self.start_tracking(fleet_commander, channel)
 
         if message.author.bot:
