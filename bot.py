@@ -327,9 +327,9 @@ class MyClient(discord.Client):
         if message.author.bot:
             return
 
-        # if message.content.startswith('!hello'):
-        #     await message.channel.send('Hello {0.author.mention}'.format(message))
-        #     return
+        if message.content.startswith('!hello'):
+            await message.channel.send('Hello {0.author.mention}'.format(message))
+            return
 
         if message.content.startswith('!RC'):
 
