@@ -2,7 +2,6 @@
 
 import discord
 import cfg
-from dotenv import load_dotenv
 import database
 from esipy import EsiApp
 from esipy import EsiClient
@@ -12,14 +11,9 @@ from datetime import timezone
 from datetime import timedelta
 from random import randint
 import asyncio
-import re
 
-load_dotenv()
 token = cfg.token
 wait_time = 30
-
-madmin_file = open("madmin.txt", 'w')
-
 
 connection = database.create_connection(
     "rollcall", "postgres", cfg.db_password, "127.0.0.1", "5432"
@@ -33,7 +27,7 @@ app = esi_app.get_dev_swagger
 security = EsiSecurity(
     redirect_uri='http://51.158.104.35:5000/tokens/new',
     client_id='1922eb4bb2294e1ab3f47f15b50de475',
-    secret_key= cfg.secret,
+    secret_key=cfg.secret,
     headers={'User-Agent': cfg.agent},
 )
 
@@ -47,7 +41,7 @@ class MyClient(discord.Client):
     async def start_tracking(self, fleet_commander, channel):
         boss_id = await self.get_character_id(fleet_commander)
         if not boss_id:
-            await channel.send("Invalid FC name, tracking disabled. See help.")
+            await channel.send("Invalid FC name, tracking disabled.")
             return
 
         access_token = await self.get_access_token(boss_id, channel)
@@ -227,7 +221,7 @@ class MyClient(discord.Client):
         cursor.execute("SELECT access_token, expires, refresh_token FROM commanders WHERE char_id = %s;", (character_id,))
         row = cursor.fetchone()
         if not row:
-            url = (security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
+            url = (security.get_auth_uri(state=str(randint(100000000, 999999999)), scopes=['esi-fleets.read_fleet.v1']))
             alert = ('I\'m sorry that FC is not in my database. Please go to \n{0}\nand '
                      'try again using `!RC trackfleet <fc name>`'.format(url))
             await channel.send(alert)
@@ -244,7 +238,7 @@ class MyClient(discord.Client):
                 except:
                     print(str(datetime.utcnow()) + '\n' + traceback.format_exc())
                     url = (
-                        security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
+                        security.get_auth_uri(state=str(randint(100000000, 999999999)), scopes=['esi-fleets.read_fleet.v1']))
                     alert = ('I\'m sorry that FC\'s ESI token has expired. Please go to \n{0}\nand '
                              'try again using `!RC trackfleet <fc name>`'.format(url))
                     await channel.send(alert)
@@ -303,37 +297,37 @@ class MyClient(discord.Client):
 
         # if message.author.id == 357164098007465986 or message.channel.id == 362030937401196554 or \
         #         message.channel.id == 699851455112413194:
-        if message.channel.id == 699851455112413194:
-            lines = message.content.splitlines()
-            fleet_commander = ""
-            for line in lines:
-                if line.split(' ', 1)[0] == "FC:":
-                    fleet_commander = line.split(' ', 1)[1]
-                    break
-
-            if len(fleet_commander) == 0:
-                return
-
-            for line in lines:
-                member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
-                if member_name:
-                    break
-
-            member = message.guild.get_member_named(member_name.group(1))
-            if not member:
-                channel = message.channel
-            else:
-                channel = member
-
-            await message.add_reaction(u"\U0001F440")
-            await self.start_tracking(fleet_commander, channel)
+        # if message.channel.id == 699851455112413194:
+        #     lines = message.content.splitlines()
+        #     fleet_commander = ""
+        #     for line in lines:
+        #         if line.split(' ', 1)[0] == "FC:":
+        #             fleet_commander = line.split(' ', 1)[1]
+        #             break
+        #
+        #     if len(fleet_commander) == 0:
+        #         return
+        #
+        #     for line in lines:
+        #         member_name = re.search(r"#### SENT BY (.*?) to Dreddit - Fleets.*", line)
+        #         if member_name:
+        #             break
+        #
+        #     member = message.guild.get_member_named(member_name.group(1))
+        #     if not member:
+        #         channel = message.channel
+        #     else:
+        #         channel = member
+        #
+        #     await message.add_reaction(u"\U0001F440")
+        #     await self.start_tracking(fleet_commander, channel)
 
         if message.author.bot:
             return
 
-        if message.content.startswith('!hello'):
-            await message.channel.send('Hello {0.author.mention}'.format(message))
-            return
+        # if message.content.startswith('!hello'):
+        #     await message.channel.send('Hello {0.author.mention}'.format(message))
+        #     return
 
         if message.content.startswith('!RC'):
 
@@ -342,9 +336,9 @@ class MyClient(discord.Client):
                 await self.start_tracking(fleet_commander, message.author)
                 return
 
-            if str(message.author.id) not in cfg.authorized:
+            if str(message.author.id) not in cfg.authorized_users:
                 await message.channel.send("I DO NOT RESPECT YOUR AUTHORITY PRIVATE! "
-                                           "(Please try `!RC trackfleets <FC name>` instead)")
+                                           "(Please try `!RC trackfleet <FC name>` instead)")
 
             elif message.content.startswith('!RC set'):
                 role = message.content.split(' ', 3)[2]
@@ -550,14 +544,15 @@ class MyClient(discord.Client):
 
             elif message.content.startswith('!RC'):
                 await message.channel.send("```RollCall Commands:\n"
-                                           "!RC trackfleets <FC name> - Starts tracking a fleet under <FC name>\n"
+                                           "!RC trackfleet <FC name> - Starts tracking a fleet under <FC name>\n"
                                            "!RC set <role> <name> - Set's <name>'s role to <role> or adds them\n"
                                            "!RC member <Count> <Member Name> - Lists member's last <Count> fleets\n"
                                            "!RC list <start date> <end date> - Lists all fleets from "
                                            "<start date> to <end date>\n"
-                                           "!RC stats <type> <start date> <end date> - Lists <type> statistics from "
-                                           "<start date> to <end date>\n"
-                                           "!RC fleet <fleet id> - Lists all information about <fleet id>```")
+                                           "!RC stats <type> <start date> <end date> - Lists <type> (% is wildcard)"
+                                           " statistics from <start date> to <end date>\n"
+                                           "!RC fleet <fleet id> - Lists all information about <fleet id>\n"
+                                           "(Date format is DD-MM-YYYY)```")
 
 
 discord_client = MyClient()

@@ -17,12 +17,12 @@ cursor = connection.cursor()
 security = EsiSecurity(
     redirect_uri='http://51.158.104.35:5000/tokens/new',
     client_id='1922eb4bb2294e1ab3f47f15b50de475',
-    secret_key= cfg.secret,
+    secret_key=cfg.secret,
     headers={'User-Agent': cfg.agent},
 )
 
 
-print (security.get_auth_uri(state=randint(100000000, 999999999), scopes=['esi-fleets.read_fleet.v1']))
+print(security.get_auth_uri(state=str(randint(100000000, 999999999)), scopes=['esi-fleets.read_fleet.v1']))
 
 
 def create_app(config_filename=None):
