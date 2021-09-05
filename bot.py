@@ -3,6 +3,7 @@
 import discord
 import cfg
 import database
+import traceback
 from esipy import EsiApp
 from esipy import EsiClient
 from esipy import EsiSecurity
