@@ -377,7 +377,7 @@ class MyClient(discord.Client):
                 cursor.execute("SELECT DISTINCT fleets.fleet_id, fleets.fc, fleets.date, fleets.duration, names.role "
                                "FROM members LEFT JOIN fleets on members.fleet_id=fleets.fleet_id "
                                "LEFT JOIN names on members.char_id = names.char_id "
-                               "WHERE members.char_id = %s LIMIT %s;",
+                               "WHERE members.char_id = %s LIMIT %s ORDER BY 3 DESC;",
                                (char_id, count,))
                 rows = cursor.fetchall()
                 output = "```Listing {0}'s ({2}) last {1} fleets\n". format(member, count, rows[0][4])
