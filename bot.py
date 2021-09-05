@@ -54,7 +54,7 @@ class MyClient(discord.Client):
         )
         row = cursor.fetchone()
         if row[0] == 1:
-            await channel.send("I am already watching. Please just start your fleet.")
+            await channel.send("I am already watching. Please just start your fleet if you haven't already.")
             return
 
         update_query = (
@@ -144,6 +144,7 @@ class MyClient(discord.Client):
                 update_query = (
                     "UPDATE commanders SET watching = %s WHERE char_id = %s;"
                 )
+
                 cursor.execute(update_query, (1, boss_id,))
                 continue
 
