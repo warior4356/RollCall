@@ -327,13 +327,13 @@ class MyClient(discord.Client):
         if message.author.bot:
             return
 
-        if message.content.startswith('!hello'):
+        if message.content.lower().startswith('!hello'):
             await message.channel.send('Hello {0.author.mention}'.format(message))
             return
 
-        if message.content.startswith('!RC'):
+        if message.content.lower().startswith('!rc'):
 
-            if message.content.startswith('!RC trackfleet'):
+            if message.content.lower().startswith('!rc trackfleet'):
                 fleet_commander = message.content.split(' ', 2)[2]
                 await self.start_tracking(fleet_commander, message.author)
                 return
@@ -342,7 +342,7 @@ class MyClient(discord.Client):
                 await message.channel.send("I DO NOT RESPECT YOUR AUTHORITY PRIVATE! "
                                            "(Please try `!RC trackfleet <FC name>` instead)")
 
-            elif message.content.startswith('!RC set'):
+            elif message.content.lower().startswith('!rc set'):
                 role = message.content.split(' ', 3)[2]
                 name = message.content.split(' ', 3)[3]
                 char_id = await self.get_character_id(name)
@@ -368,7 +368,7 @@ class MyClient(discord.Client):
                     cursor.execute(update_query, (role, char_id,))
                     await message.channel.send("{0} set to {1}".format(name, role))
 
-            elif message.content.startswith('!RC member'):
+            elif message.content.lower().startswith('!rc member'):
                 count = message.content.split(' ', 3)[2]
                 member = message.content.split(' ', 3)[3]
                 char_id = await self.get_character_id(member)
@@ -407,7 +407,7 @@ class MyClient(discord.Client):
                 output += "```"
                 await message.channel.send(output)
 
-            elif message.content.startswith('!RC list'):
+            elif message.content.lower().startswith('!rc list'):
                 start = message.content.split(' ', 3)[2]
                 end = message.content.split(' ', 3)[3]
                 cursor.execute("SELECT DISTINCT fleets.fleet_id, fleets.date, fleets.duration, fleets.fc "
@@ -439,7 +439,7 @@ class MyClient(discord.Client):
                 output += "```"
                 await message.channel.send(output)
 
-            elif message.content.startswith('!RC stats'):
+            elif message.content.lower().startswith('!rc stats'):
                 role = message.content.split(' ', 4)[2]
                 start = message.content.split(' ', 4)[3]
                 end = message.content.split(' ', 4)[4]
@@ -503,7 +503,7 @@ class MyClient(discord.Client):
                 output += "```"
                 await message.channel.send(output)
 
-            elif message.content.startswith('!RC fleet'):
+            elif message.content.lower().startswith('!rc fleet'):
                 fleet_id = message.content.split(' ', 2)[2]
                 cursor.execute("SELECT DISTINCT members.char_id, fleets.fc, fleets.date, "
                                "fleets.duration, names.name "
@@ -544,16 +544,16 @@ class MyClient(discord.Client):
                 output += "```"
                 await message.channel.send(output)
 
-            elif message.content.startswith('!RC'):
+            elif message.content.lower().startswith('!rc'):
                 await message.channel.send("```RollCall Commands:\n"
-                                           "!RC trackfleet <FC name> - Starts tracking a fleet under <FC name>\n"
-                                           "!RC set <role> <name> - Set's <name>'s role to <role> or adds them\n"
-                                           "!RC member <Count> <Member Name> - Lists member's last <Count> fleets\n"
-                                           "!RC list <start date> <end date> - Lists all fleets from "
+                                           "!rc trackfleet <FC name> - Starts tracking a fleet under <FC name>\n"
+                                           "!rc set <role> <name> - Set's <name>'s role to <role> or adds them\n"
+                                           "!rc member <Count> <Member Name> - Lists member's last <Count> fleets\n"
+                                           "!rc list <start date> <end date> - Lists all fleets from "
                                            "<start date> to <end date>\n"
-                                           "!RC stats <type> <start date> <end date> - Lists <type> (% is wildcard)"
+                                           "!rc stats <type> <start date> <end date> - Lists <type> (% is wildcard)"
                                            " statistics from <start date> to <end date>\n"
-                                           "!RC fleet <fleet id> - Lists all information about <fleet id>\n"
+                                           "!rc fleet <fleet id> - Lists all information about <fleet id>\n"
                                            "(Date format is DD-MM-YYYY)```")
 
 
